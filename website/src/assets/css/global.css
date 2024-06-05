@@ -28,19 +28,23 @@
  
 @layer base {
     pre {
-      @apply mockup-code p-4;
+      @apply mockup-code p-4 my-4;
     }
     h1 {
-        @apply text-2xl;
+        @apply text-2xl my-8;
       }
       h2 {
-        @apply text-xl;
+        @apply text-xl my-6;
       }
       li {
         @apply list-disc list-inside;
       }
       ul ul {
         @apply nested-lists ml-4;
+      }
+      ul.theme.controller li {
+        @apply list-none list-inside;
+
       }
 
   }
