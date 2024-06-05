@@ -1,5 +1,5 @@
 ---
-title: Part 2, Demo Chapter
+title: "Part 2, Demo Chapter"
 # slug: my-custom-slug/supports/slashes
 tags:
   - golang
