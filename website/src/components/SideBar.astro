@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+const part1Chapters = await getCollection('part1-chapters');
+const part2Chapters = await getCollection('part2-chapters');
+---
+<ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+  {part1Chapters.map(part1Chapter => (
+    <li>
+      <a href={`/part1/${part1Chapter.slug}`}>{part1Chapter.data.title}</a>
+      {
+        /**
+         * 
+         */
+        // <time datetime={part1Chapter.data.publishedDate.toISOString()}>
+        //   {part1Chapter.data.publishedDate.toDateString()}
+        // </time>
+      }
+
+    </li>
+  ))}
+
+{part2Chapters.map(part2Chapter => (
+    <li>
+      <a href={`/part2/${part2Chapter.slug}`}>{part2Chapter.data.title}</a>
+      {
+        /**
+         * 
+         */
+        // <time datetime={part2Chapter.data.publishedDate.toISOString()}>
+        //   {part2Chapter.data.publishedDate.toDateString()}
+        // </time>
+      }
+
+    </li>
+  ))}
+</ul>
+
+

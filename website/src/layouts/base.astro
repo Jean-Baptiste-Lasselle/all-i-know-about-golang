@@ -1,0 +1,47 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import NavBar from "../components/NavBar.astro";
+import SideBar from "../components/SideBar.astro";
+import Footer from "../components/Footer.astro";
+
+import '../assets/css/global.css'
+
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <BaseHead title={title} />
+  </head>
+  <body>
+    <div class="flex flex-col h-screen justify-between">
+        <!--
+        <header class="h-10 bg-red-500">Header</header>
+        <main class="mb-auto h-10 bg-green-500">Content</main>
+        <footer class="h-10 bg-blue-500">Footer</footer>
+         -->
+
+         <NavBar />
+
+         <div class="drawer drawer-end">
+           <input id="my-drawer" type="checkbox" class="drawer-toggle" />
+           <div class="drawer-content">
+             <!-- Page content here -->
+             <!-- label for="my-drawer-4" class="drawer-button btn btn-primary">Open drawer</label -->
+     
+             <slot />
+             <!-- your content is injected here -->
+           </div>
+           <div class="drawer-side">
+             <label for="my-drawer" aria-label="close sidebar" class="drawer-overlay"
+             ></label>
+             <SideBar />
+           </div>
+         </div>
+     
+         <Footer />
+    </div>
+  </body>
+</html>
