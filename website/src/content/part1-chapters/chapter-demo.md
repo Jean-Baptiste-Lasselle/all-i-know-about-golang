@@ -21,6 +21,8 @@ Your blog post content here.
   * sdfsdsdf
   * sdfsdsdf
 
+### Sub title one
+
 1. step 1:
 
 ```bash
@@ -36,6 +38,8 @@ cd ./here
 run this command
 sudo apt-get install -y bash curl wget jq gettext
 ```
+
+### Sub title two
 
 * create that file:
 

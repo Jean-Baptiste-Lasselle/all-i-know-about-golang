@@ -27,6 +27,9 @@
 
  
 @layer base {
+  html{
+    scroll-behavior: smooth;
+  }
     pre {
       @apply mockup-code p-4 my-4;
     }
@@ -34,7 +37,7 @@
         @apply text-2xl my-8;
       }
       h2 {
-        @apply text-xl my-6;
+        @apply text-xl my-6 mt-32;
       }
       li {
         @apply list-disc list-inside;

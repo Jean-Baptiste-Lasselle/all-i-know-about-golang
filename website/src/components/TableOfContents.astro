@@ -22,17 +22,17 @@ const grouppedHeadings = headings.reduce((array, heading) => {
 
 
 
-<nav id="table-of-contents" aria-label="Table Of Contents" class=" fixed mt-20 p-3 pt-7">
+<nav id="table-of-contents" aria-label="Table Of Contents" class="transition-all ease-in-out delay-700 fixed p-3">
   <ol>
     {
       grouppedHeadings.map((h) => (
         <li>
-          <a href={`#${h.slug}`}>{h.text}</a>
+          <a href={`#${h.slug}`} class="transition-all ease-in-out delay-700">{h.text}</a>
           {h.subheadings.length > 0 && (
             <ol>
               {h.subheadings.map((sub) => (
                 <li>
-                  <a href={`#${sub.slug}`}>{sub.text}</a>
+                  <a href={`#${sub.slug}`} class="transition-all ease-in-out delay-700">{sub.text}</a>
                 </li>
               ))}
             </ol>
@@ -85,11 +85,15 @@ const grouppedHeadings = headings.reduce((array, heading) => {
 
 <style>
 .active-toc-item {
+  transition-property: all;
+  transition-duration: 700ms;
   font-weight: bold;
   position:sticky;
   top:0
 }
 .article-toc{
+  transition-property: all;
+  transition-duration: 700ms;
   position:sticky;
   top:0
 }

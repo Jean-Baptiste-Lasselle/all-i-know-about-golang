@@ -17,7 +17,7 @@ interface Props {
 const { title, toc_headings } = Astro.props;
 ---
 
-<html lang="en" class=" overflow-y-scroll no-scrollbar">
+<html lang="en" class="smooth-scroll overflow-y-scroll no-scrollbar">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,7 +33,7 @@ const { title, toc_headings } = Astro.props;
          -->
 
          <NavBar />
-<div id="main_content" class="grid grid-cols-4 gap-4">
+<div id="main_content" class="grid grid-cols-4 gap-4 container mx-auto md:container md:mx-auto mt-24">
   <div class="left column side toc">
   <TableOfContents headings={toc_headings}/>
 
@@ -44,7 +44,7 @@ const { title, toc_headings } = Astro.props;
       <input id="my-drawer" type="checkbox" class="drawer-toggle" />
       <input id="my-toc-drawer" type="checkbox" class="drawer-toggle" /> 
 
-      <div class="drawer-content container mx-auto md:container md:mx-auto mt-24">
+      <div class="drawer-content p-3">
         <!-- Page content here -->
         <!-- label for="my-drawer-4" class="drawer-button btn btn-primary">Open drawer</label -->
 
