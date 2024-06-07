@@ -1,25 +1,45 @@
 ---
-import ChapterLayout from '../../layouts/base.astro';
+import ChapterLayout from "../../layouts/base.astro";
 
-import { getCollection } from 'astro:content';
+
+import { getCollection } from "astro:content";
 // 1. Generate a new path for every collection entry
 export async function getStaticPaths() {
-  const chaptersEntries = await getCollection('part1-chapters');
-  return chaptersEntries.map(entry => ({
-    params: { slug: entry.slug }, props: { entry },
+  const chaptersEntries = await getCollection("part1-chapters");
+  return chaptersEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
   }));
 }
 // 2. For your template, you can get the entry directly from the prop
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+const { Content, headings } = await entry.render();
+const heroeImageUrl = `https://picsum.photos/700/200`;
 ---
-<ChapterLayout title="Home Page">
-    <h1>{entry.data.title}</h1>
-    <article>
-        <p>My first Chapter, wrapped in a layout!</p>
-    </article>
-    <Content />
+
+<ChapterLayout title={entry.data.title} toc_headings={headings}>
+  <!--
+    Hero card heading any content entry
+    -->
+  <div
+    class="hero min-h-screen/2 mb-6 rounded-lg"
+    style={`background-image: url(${heroeImageUrl});`}
+  >
+    <div class="hero-overlay bg-opacity-60 rounded-lg"></div>
+    <div class="hero-content text-center text-neutral-content rounded-lg">
+      <div class="max-w-md">
+        <h1 class="mb-5 text-5xl font-bold">{entry.data.title}</h1>
+        <p class="mb-5">
+          
+          {entry.data.summary || `Provident cupiditate voluptatem et in. Quaerat fugiat ut assumenda
+            excepturi exercitationem quasi. In deleniti eaque aut repudiandae et a
+            id nisi.`}
+          
+        </p>
+        <button class="btn btn-primary">Get Started</button>
+      </div>
+    </div>
+  </div>
+
+  <Content />
 </ChapterLayout>
-
-
-

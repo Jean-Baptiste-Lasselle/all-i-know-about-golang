@@ -12,6 +12,7 @@ export default {
     },
   },
 	plugins: [
+    require("@tailwindcss/typography"),
 		require('daisyui'),
     plugin(({ addVariant }) => {
       // https://tailwindcss.com/docs/plugins

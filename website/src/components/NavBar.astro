@@ -1,5 +1,6 @@
 ---
 
+
 const daisyUiThemes = [
       "light",
       "dark",
@@ -36,9 +37,11 @@ const daisyUiThemes = [
     ];
 ---
 
-<div class="navbar bg-base-100">
+<div class="navbar bg-primary bg-opacity-40 max-w-full fixed z-50">
+
   <div class="flex-none">
-    <label for="my-drawer" class="btn btn-primary drawer-button">
+    <label for="my-drawer" 
+          class="btn btn-primary drawer-button">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -48,14 +51,20 @@ const daisyUiThemes = [
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
-          d="M4 6h16M4 12h16M4 18h16"></path></svg
-      >
+          d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+
     </label>
   </div>
   <div class="flex-1">
-    <a class="btn btn-ghost text-xl">daisyUI</a>
+    <a href="#" class="btn btn-ghost text-3xl text-white">All I know About Golang</a>
+  </div>
+  <div class="flex-1 gap-2">
+    <!-- Place this tag where you want the button to render. -->
+    <a class="github-button p-4 my-auto text-2xl" href="https://github.com/Jean-Baptiste-Lasselle/all-i-know-about-golang" data-color-scheme="no-preference: dark; light: dark; dark: dark_high_contrast;" data-size="large" data-show-count="true" aria-label="Star Jean-Baptiste-Lasselle/all-i-know-about-golang on GitHub">Star</a>
   </div>
   <div class="flex-none gap-2">
+
     <div class="form-control">
       <input
         type="text"
@@ -64,13 +73,12 @@ const daisyUiThemes = [
       />
     </div>
 
-
     <div>
 
       <!--
         theme controller
        -->
-       <div class="dropdown">
+       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn m-1">
           Theme
           <svg width="12px" height="12px" class="h-2 w-2 fill-current opacity-60 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2048 2048"><path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path></svg>
@@ -87,7 +95,7 @@ const daisyUiThemes = [
     </div>
 
 
-    <div class="dropdown dropdown-end">
+    <!-- div class="dropdown dropdown-end">
       <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
         <div class="w-10 rounded-full">
           <img
@@ -110,15 +118,57 @@ const daisyUiThemes = [
         <li><a>Logout</a></li>
       </ul>
 
+    </div -->
+
+
+
+    <div class="flex-none">
+      <label for="my-drawer" class="btn btn-primary drawer-button">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          class="inline-block w-5 h-5 stroke-current"
+          ><path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path></svg
+        >
+      </label>
     </div>
+
   </div>
 </div>
 
 
-<div class="join join-vertical">
-  
-  
-  
-  
-  
-</div>
+
+		<!-- Place this tag in your head or just before your close body tag. -->
+    <!-- script async defer src="https://buttons.github.io/buttons.js"></script -->
+    <script async defer>
+
+      document.addEventListener('astro:page-load', ()=>{
+        
+      /*----------------------------------------------------------
+      --------------------0-GET DOM ELEMENTS----------------------
+      ----------------------------------------------------------*/
+        
+        
+        if (document.getElementById("github-star-rating-script")) {
+          // document.getElementById("github-star-rating-script")?.remove();
+          document.getElementById("github-star-rating-script")?.remove();
+          console.info(`just removed github star rating script in <head>`)
+        }
+        var addScript = document.createElement("script");
+        addScript.type = "text/javascript";
+        addScript.id = "github-star-rating-script";
+        addScript.src = `https://buttons.github.io/buttons.js`;
+        (document.getElementsByTagName("head")[0] || document.documentElement ).appendChild(addScript);
+
+        // console.info(`just added github star rating script in <head>`)
+      })
+    
+      //document.addEventListener('astro:after-swap', animate);
+    
+    </script>
+    
