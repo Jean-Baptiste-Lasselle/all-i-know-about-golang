@@ -15,4 +15,5 @@ const part1ChaptersCollection = defineCollection({
 export const collections = {
   'part1-chapters': part1ChaptersCollection,
   'part2-chapters': part1ChaptersCollection,
+  'demopart-chapters': part1ChaptersCollection,
 };

@@ -4,6 +4,7 @@ title: Part 2, Chapter 1
 tags:
   - golang
   - basics
+summary: Second Part, structure of a Golang app
 ---
 
 ## The Basics of Golang

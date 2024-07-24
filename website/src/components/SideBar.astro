@@ -1,49 +1,73 @@
 ---
-import { getCollection } from 'astro:content';
-const part1Chapters = await getCollection('part1-chapters');
-const part2Chapters = await getCollection('part2-chapters');
-
-
-
+import { getCollection } from "astro:content";
+const part1Chapters = await getCollection("part1-chapters");
+const part2Chapters = await getCollection("part2-chapters");
+const demoChapters = await getCollection("demopart-chapters");
 ---
 
-
-  <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content overflow-y-scroll no-scrollbar">
-
-    <div class="mockup-window border bg-base-300 mb-6 mt-16">
-      <div class="flex justify-center px-4 py-16 bg-base-200">Table of Content</div>
+<ul
+  class="menu p-4 w-80 min-h-full bg-base-200 text-base-content overflow-y-scroll no-scrollbar"
+>
+  <div
+    class="p-2 rounded-md border-2 border-secondary hover:border-accent bg-base-900 mb-2 mt-20"
+  >
+    <div class="flex justify-center px-4 py-16 bg-base-200">
+      <h3>Part 1</h3>
     </div>
-    {part1Chapters.map(part1Chapter => (
+
+    {
+      part1Chapters.map((part1Chapter) => (
+        <li>
+          <a href={`/part1/${part1Chapter.slug}`}>{part1Chapter.data.title}</a>
+          {
+            /**
+             *
+             */
+            // <time datetime={part1Chapter.data.publishedDate.toISOString()}>
+            //   {part1Chapter.data.publishedDate.toDateString()}
+            // </time>
+          }
+        </li>
+      ))
+    }
+  </div>
+
+  <div
+    class="p-2 rounded-md border-2 border-secondary hover:border-accent bg-base-900 mb-2 mt-2"
+  >
+    <div class="flex justify-center px-4 py-16 bg-base-200">
+      <h3>Part 2</h3>
+    </div>
+
+    {
+      part2Chapters.map((part2Chapter) => (
+        <li>
+          <a href={`/part2/${part2Chapter.slug}`}>{part2Chapter.data.title}</a>
+          {
+            /**
+             *
+             */
+            // <time datetime={part2Chapter.data.publishedDate.toISOString()}>
+            //   {part2Chapter.data.publishedDate.toDateString()}
+            // </time>
+          }
+        </li>
+      ))
+    }
+  </div>
+  {
+    demoChapters.map((demoChapter) => (
       <li>
-        <a href={`/part1/${part1Chapter.slug}`}>{part1Chapter.data.title}</a>
+        <a href={`/demo/${demoChapter.slug}`}>{demoChapter.data.title}</a>
         {
           /**
-           * 
-           */
-          // <time datetime={part1Chapter.data.publishedDate.toISOString()}>
-          //   {part1Chapter.data.publishedDate.toDateString()}
-          // </time>
-        }
-  
-      </li>
-    ))}
-  {part2Chapters.map(part2Chapter => (
-      <li>
-        <a href={`/part2/${part2Chapter.slug}`}>{part2Chapter.data.title}</a>
-        {
-          /**
-           * 
+           *
            */
           // <time datetime={part2Chapter.data.publishedDate.toISOString()}>
           //   {part2Chapter.data.publishedDate.toDateString()}
           // </time>
         }
-  
       </li>
-    ))}
-
-
-  
-  
-
+    ))
+  }
 </ul>

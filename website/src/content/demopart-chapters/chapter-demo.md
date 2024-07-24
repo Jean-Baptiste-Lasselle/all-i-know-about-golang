@@ -1,9 +1,11 @@
 ---
-title: "Part 2, Demo Chapter"
+title: Demo Part, Demo Chapter
 # slug: my-custom-slug/supports/slashes
 tags:
-  - golang
-  - basics
+  - astro
+  - template
+  - demo
+  - content
 ---
 
 ## The Basics of Golang
@@ -13,11 +15,17 @@ Your blog post content here.
 * sdfsdf
 * sdfsdf:
   * sdfsdsdf
-  * sdfsdsdf
+  * sdfsdsdf:
+    * [ ] cdcscsd
+    * [x] cdcscsd
+    * [ ] cdcscsd
+    * [ ] cdcscsd
   * sdfsdsdf
   * sdfsdsdf
 
-* step 1:
+### Sub title one
+
+1. step 1:
 
 ```bash
 cd ./here
@@ -33,9 +41,11 @@ run this command
 sudo apt-get install -y bash curl wget jq gettext
 ```
 
+### Sub title two
+
 * create that file:
 
-```Yaml
+```yml
 apiVersion:  kind.x-k8s.io/v1alpha4
 kind: Cluster
 # patch the generated kubeadm config with some extra settings
@@ -93,7 +103,7 @@ sudo apt-get install -y bash curl wget jq gettext
 
 * create that file:
 
-```Yaml
+```yml
 apiVersion:  kind.x-k8s.io/v1alpha4
 kind: Cluster
 # patch the generated kubeadm config with some extra settings
@@ -151,7 +161,7 @@ sudo apt-get install -y bash curl wget jq gettext
 
 * create that file:
 
-```Yaml
+```yml
 apiVersion:  kind.x-k8s.io/v1alpha4
 kind: Cluster
 # patch the generated kubeadm config with some extra settings
@@ -209,7 +219,7 @@ sudo apt-get install -y bash curl wget jq gettext
 
 * create that file:
 
-```Yaml
+```yml
 apiVersion:  kind.x-k8s.io/v1alpha4
 kind: Cluster
 # patch the generated kubeadm config with some extra settings
@@ -267,7 +277,7 @@ sudo apt-get install -y bash curl wget jq gettext
 
 * create that file:
 
-```Yaml
+```yml
 apiVersion:  kind.x-k8s.io/v1alpha4
 kind: Cluster
 # patch the generated kubeadm config with some extra settings
