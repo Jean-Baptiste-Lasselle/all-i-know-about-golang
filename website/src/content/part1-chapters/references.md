@@ -12,3 +12,4 @@ index: 9999
 ## References
 
 * <https://go.dev/learn/>
+* <https://gobyexample.com/>
