@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
-const part1Chapters = await getCollection("part1-chapters");
-const part2Chapters = await getCollection("part2-chapters");
-const demoChapters = await getCollection("demopart-chapters");
+const part1Chapters = (await getCollection("part1-chapters")).sort((a, b) => a.data.index - b.data.index);
+const part2Chapters = (await getCollection("part2-chapters")).sort((a, b) => a.data.index - b.data.index);
+const demoChapters = (await getCollection("demopart-chapters")).sort((a, b) => a.data.index - b.data.index);
 ---
 
 <ul

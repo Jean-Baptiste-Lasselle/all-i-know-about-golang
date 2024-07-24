@@ -6,6 +6,7 @@ tags:
   - basics
 
 summary: First Part, The basics of Golang, Chapter 2
+index: 1
 ---
 
 ## The Basics of Golang
