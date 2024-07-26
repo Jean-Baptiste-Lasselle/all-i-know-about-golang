@@ -1,17 +1,56 @@
 ---
 import { getCollection } from "astro:content";
-const part1Chapters = (await getCollection("part1-chapters")).sort((a, b) => a.data.index - b.data.index);
-const part2Chapters = (await getCollection("part2-chapters")).sort((a, b) => a.data.index - b.data.index);
-const demoChapters = (await getCollection("demopart-chapters")).sort((a, b) => a.data.index - b.data.index);
+
+const questionomicon = (await getCollection("questionomicon")).sort(
+  (a, b) => a.data.index - b.data.index
+);
+
+const part1Chapters = (await getCollection("part1-chapters")).sort(
+  (a, b) => a.data.index - b.data.index
+);
+const part2Chapters = (await getCollection("part2-chapters")).sort(
+  (a, b) => a.data.index - b.data.index
+);
+const demoChapters = (await getCollection("demopart-chapters")).sort(
+  (a, b) => a.data.index - b.data.index
+);
 ---
 
 <ul
   class="menu p-4 w-80 min-h-full bg-base-200 text-base-content overflow-y-scroll no-scrollbar"
 >
+
+<div
+class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-2 mt-20"
+>
+<!-- div class="flex justify-center px-4 py-6 bg-base-200" -->
+<div class="flex justify-center px-4 py-6 bg-accent rounded-md">
+  <h3>The Questionomicon</h3>
+</div>
+
+{
+  questionomicon.map((questionomiconChapter) => (
+    <li>
+      <a href={`/questionomicon/${questionomiconChapter.slug}`}>{questionomiconChapter.data.title}</a>
+      {
+        /**
+         *
+         */
+        // <time datetime={part1Chapter.data.publishedDate.toISOString()}>
+        //   {part1Chapter.data.publishedDate.toDateString()}
+        // </time>
+      }
+    </li>
+  ))
+}
+</div>
+
+
   <div
-    class="p-2 rounded-md border-2 border-secondary hover:border-accent bg-base-900 mb-2 mt-20"
+    class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-2 mt-2"
   >
-    <div class="flex justify-center px-4 py-16 bg-base-200">
+    <!-- div class="flex justify-center px-4 py-6 bg-base-200" -->
+    <div class="flex justify-center px-4 py-6 bg-accent rounded-md">
       <h3>Part 1</h3>
     </div>
 
@@ -33,9 +72,10 @@ const demoChapters = (await getCollection("demopart-chapters")).sort((a, b) => a
   </div>
 
   <div
-    class="p-2 rounded-md border-2 border-secondary hover:border-accent bg-base-900 mb-2 mt-2"
+    class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-2 mt-2"
   >
-    <div class="flex justify-center px-4 py-16 bg-base-200">
+    <!-- div class="flex justify-center px-4 py-6 bg-base-200" -->
+    <div class="flex justify-center px-4 py-6 bg-accent rounded-md">
       <h3>Part 2</h3>
     </div>
 
@@ -55,19 +95,29 @@ const demoChapters = (await getCollection("demopart-chapters")).sort((a, b) => a
       ))
     }
   </div>
-  {
-    demoChapters.map((demoChapter) => (
-      <li>
-        <a href={`/demo/${demoChapter.slug}`}>{demoChapter.data.title}</a>
-        {
-          /**
-           *
-           */
-          // <time datetime={part2Chapter.data.publishedDate.toISOString()}>
-          //   {part2Chapter.data.publishedDate.toDateString()}
-          // </time>
-        }
-      </li>
-    ))
-  }
+
+  <div
+    class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-2 mt-2"
+  >
+    <!-- div class="flex justify-center px-4 py-6 bg-base-200" -->
+    <div class="flex justify-center px-4 py-6 bg-accent rounded-md">
+      <h3>Demo Part</h3>
+    </div>
+
+    {
+      demoChapters.map((demoChapter) => (
+        <li>
+          <a href={`/demo/${demoChapter.slug}`}>{demoChapter.data.title}</a>
+          {
+            /**
+             *
+             */
+            // <time datetime={part2Chapter.data.publishedDate.toISOString()}>
+            //   {part2Chapter.data.publishedDate.toDateString()}
+            // </time>
+          }
+        </li>
+      ))
+    }
+  </div>
 </ul>

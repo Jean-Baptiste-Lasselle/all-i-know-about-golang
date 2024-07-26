@@ -1,7 +1,7 @@
 import { z, defineCollection } from 'astro:content'
 
 // 2. Define a `type` and `schema` for each collection
-const part1ChaptersCollection = defineCollection({
+const chaptersCollection = defineCollection({
   type: 'content', // v2.5.0 and later
   schema: z.object({
     title: z.string(),
@@ -14,7 +14,8 @@ const part1ChaptersCollection = defineCollection({
 
 // 3. Export a single `collections` object to register your collection(s)
 export const collections = {
-  'part1-chapters': part1ChaptersCollection,
-  'part2-chapters': part1ChaptersCollection,
-  'demopart-chapters': part1ChaptersCollection,
+  'questionomicon': chaptersCollection,
+  'part1-chapters': chaptersCollection,
+  'part2-chapters': chaptersCollection,
+  'demopart-chapters': chaptersCollection,
 };
