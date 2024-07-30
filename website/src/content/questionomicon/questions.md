@@ -22,7 +22,7 @@ index: 1
 * [ ] What about multithreading in Golang?
 * [ ] What about deep copy / shallow copy /immutability of objects in Golang?
 * [ ] What about asynhronous functions in Golang?
-
+* [ ] What about building a golang package containing only types definitions, and re-use the package into a golang app?
 <!--
 * [ ] cdcscsd
 * [x] cdcscsd
@@ -32,7 +32,13 @@ index: 1
 
 ## Design Patterns Questions
 
-* [ ] How can I implement inversion of control/Dependency injection in Golang?
+* [ ] How can I implement inversion of control/Dependency Injection in Golang? (patterns, frameworks?)
+* [ ] A typical CI/CD for a CLI app ? for a webb app ?
+* [ ] A typical CI/CD for a terraform provider?
+* [ ] A typical CI/CD for a packer plugin provider?
+* [ ] How to use gRPC to implement a plugin mechanism? (hot/cold pluggable plugins?)
+
+
 
 <!--
 * [ ] cdcscsd
