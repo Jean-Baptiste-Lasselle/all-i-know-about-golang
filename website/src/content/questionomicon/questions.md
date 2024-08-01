@@ -24,7 +24,10 @@ index: 1
 * [ ] What about asynhronous functions in Golang?
 * [ ] What about building a golang package containing only types definitions, and re-use the package into a golang app?
 * [ ] The expression `T(v)` converts the value `v` to the type `T`. A few examples of type conversions can be seen in example4, for primary types. Yet, We will see if the same syntax can be used to convert between complex Types I will define, like Upcasting Downcasting between "siblings" types (eg classes with _"inherits"_ relation) in other languages.
-
+* [ ] What about collection types in Golang (Set, Map Lists, LinkedLists)?
+* [ ] see all types of loops in Golang (for while foreach iterators in relation with ?)
+* [ ] network programming in golang ? How to send/receive ARP / ICMP /  IP / TCP / UDP ? implement a wake on lan
+* [ ] What about multi threading and semaphores in Golang ?
 <!--
 * [ ] cdcscsd
 * [x] cdcscsd
