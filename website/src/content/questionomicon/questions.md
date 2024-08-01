@@ -42,7 +42,7 @@ index: 1
 * [ ] A typical CI/CD for a terraform provider?
 * [ ] A typical CI/CD for a packer plugin provider?
 * [ ] How to use gRPC to implement a plugin mechanism? (hot/cold pluggable plugins?)
-
+* [ ] How do I use (with best practices) goreleaser to implement a CI/CD with and without monorepo pattern?
 
 
 <!--
@@ -51,3 +51,17 @@ index: 1
 * [ ] cdcscsd
 * [ ] cdcscsd
 -->
+
+## Goals
+
+* How to write a terraform / OpenTOFU plugin in Golang ?
+* How to write a packer plugin in Golang ?
+* How to write a hashicorp vault / OpenBAO plugin in Golang ?
+* How to write a Kubernetes controller in Golang ?
+* How to write a Kubernetes operator in Golang ?
+* How to write a Kubernetes cni driver in Golang ?
+* How to re-write the `cp` linux command in Golang ? How to write a Kubernetes csi driver in Golang ?
+
+
+
+
