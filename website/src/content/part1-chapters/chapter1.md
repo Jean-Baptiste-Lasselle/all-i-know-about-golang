@@ -64,7 +64,6 @@ func main() {
 }
 ```
 
-
 ### Simple variables
 
 The `var` keyword is used in GOlang to declare variables.
@@ -82,20 +81,20 @@ Here below examples of how to declare variables (and also how to display value, 
 package main
 
 import (
-	"fmt"
-	"math/cmplx"
+ "fmt"
+ "math/cmplx"
 )
 
 var (
-	myNb1, myNb2 float32 = 17.0, 13.0
+ myNb1, myNb2 float32 = 17.0, 13.0
     myNb5, myNb6 float64 = -27.12548789654, 43.46868468464543541534135416354
     myBool1, myBool2 bool = true, false
-	myGreatestUnsigned64Integer uint64     = 1<<64 - 1
+ myGreatestUnsigned64Integer uint64     = 1<<64 - 1
     /// + ---
     // if you uncomment [myMoreThanGreatestUnsigned64Integer]
     // the source code does not pass compilation checks.
-	// myMoreThanGreatestUnsigned64Integer uint64     = 1<<64
-	myComplexNumber      complex128 = cmplx.Sqrt(-5 + 12i)
+ // myMoreThanGreatestUnsigned64Integer uint64     = 1<<64
+ myComplexNumber      complex128 = cmplx.Sqrt(-5 + 12i)
 )
 
 func main() {
@@ -118,9 +117,9 @@ func main() {
     fmt.Println("myBool1 || myBool2 =", myBool1 || myBool2)
     fmt.Println("!myBool1 = ", !myBool1)
 
-	fmt.Printf("Type: %T Value: %v\n", myBool1, myBool1)
-	fmt.Printf("Type: %T Value: %v\n", myGreatestUnsigned64Integer, myGreatestUnsigned64Integer)
-	fmt.Printf("Type: %T Value: %v\n", myComplexNumber, myComplexNumber)
+ fmt.Printf("Type: %T Value: %v\n", myBool1, myBool1)
+ fmt.Printf("Type: %T Value: %v\n", myGreatestUnsigned64Integer, myGreatestUnsigned64Integer)
+ fmt.Printf("Type: %T Value: %v\n", myComplexNumber, myComplexNumber)
 }
 ```
 
