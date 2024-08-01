@@ -23,6 +23,8 @@ index: 1
 * [ ] What about deep copy / shallow copy /immutability of objects in Golang?
 * [ ] What about asynhronous functions in Golang?
 * [ ] What about building a golang package containing only types definitions, and re-use the package into a golang app?
+* [ ] The expression `T(v)` converts the value `v` to the type `T`. A few examples of type conversions can be seen in example4, for primary types. Yet, We will see if the same syntax can be used to convert between complex Types I will define, like Upcasting Downcasting between "siblings" types (eg classes with _"inherits"_ relation) in other languages.
+
 <!--
 * [ ] cdcscsd
 * [x] cdcscsd
