@@ -449,4 +449,53 @@ func main() {
 
 **`Recover`** is a built-in function that regains control of a panicking goroutine. Recover is only useful inside deferred functions. During normal execution, a call to recover will return nil and have no other effect. If the current goroutine is panicking, a call to recover will capture the value given to panic and resume normal execution.
 
-_NEXT TODO_: <https://go.dev/tour/moretypes/1>
+In Golang, funtion paramters are passed by values, unless its type is prefixed by the `*` parameter, which then means the function expects to be passed a pointer, not a bare value. If a variable `var myVar int = 42` is declared, you can generate a pointer to that variable's value using the ampersand operator, like this: `&myVar`.
+
+The `*` operator denotes the pointer's underlying value. Using the `*` is known as "dereferencing" or "indirecting".
+
+```Golang
+package main
+
+import "fmt"
+
+func zeroval(ival int) {
+ ival = 0
+}
+
+func zeroptr(iptr *int) {
+ *iptr = 0
+}
+
+func main() {
+ i := 1
+ fmt.Println("initial:", i)
+
+ zeroval(i)
+ fmt.Println("zeroval:", i)
+
+ zeroptr(&i)
+ fmt.Println("zeroptr:", i)
+
+ fmt.Println("pointer:", &i)
+
+ var myVar int = 42
+
+ var thisIsAFirstGeneratedPointerToMyVar = &myVar
+ var thisIsASecondGeneratedPointerToMyVar = &myVar
+
+ fmt.Printf("thisIsAFirstGeneratedPointerToMyVar = %v \n", thisIsAFirstGeneratedPointerToMyVar)
+ fmt.Printf("thisIsASecondGeneratedPointerToMyVar = %v \n", thisIsASecondGeneratedPointerToMyVar)
+
+ fmt.Println("read [myVar] through the [thisIsAFirstGeneratedPointerToMyVar] pointer:")
+ fmt.Println(*thisIsAFirstGeneratedPointerToMyVar) // read [myVar] through the [thisIsAFirstGeneratedPointerToMyVar] pointer
+ *thisIsASecondGeneratedPointerToMyVar = 21        // set myVar through the [thisIsASecondGeneratedPointerToMyVar] pointer
+ fmt.Printf("after setting [myVar] through the [thisIsASecondGeneratedPointerToMyVar] pointer, myVar = %v \n", myVar)
+}
+
+```
+
+The pointer of a variable is the address, in memory, where the value of that variable is stored.
+
+Unlike C, Go has no pointer arithmetic.
+
+_NEXT TODO_: <https://go.dev/tour/moretypes/2>
