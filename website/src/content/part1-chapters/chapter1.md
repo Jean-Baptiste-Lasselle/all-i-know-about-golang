@@ -36,6 +36,10 @@ go build -o app.exe *.go
 # ---
 # and well execute it like this:
 ./app.exe
+
+# ---
+# note you can prettify/format your go code by running:
+go fmt *.go
 ```
 
 ### Primary types in Golang
@@ -160,4 +164,289 @@ The expression `T(v)` converts the value `v` to the type `T`.
 
 A few examples of type conversions can be seen in example4, for primary types. Yet, We will see if the same syntax can be used to convert between complex Types I will define, like Upcasting Downcasting between "siblings" types (eg classes with _"inherits"_ relation) in other languages.
 
-_NEXT TODO_: <https://go.dev/tour/basics/14>
+### Type inference
+
+When declaring a variable without specifying an explicit type (either by using the `:=` syntax or `var =` expression syntax), the variable's type is inferred from the value on the right hand side.
+
+### Constants
+
+Syntax of declaring a constant is:
+
+```Golang
+package main
+
+import "fmt"
+
+const Pi = 3.14
+
+func main() {
+ const World = "世界"
+ fmt.Println("Hello", World)
+ fmt.Println("Happy", Pi, "Day")
+
+ const Truth = true
+ fmt.Println("Go rules?", Truth)
+}
+```
+
+* Constants can be character, string, boolean, or numeric values.
+* Constants cannot be declared using the `:=` syntax.
+
+### For loops
+
+Here is a classicla for loop syntax in golang:
+
+```Golang
+package main
+
+import "fmt"
+
+func main() {
+ // first loop example
+ sum := 0
+ for i := 0; i < 10; i++ {
+  sum += i
+ }
+ fmt.Println(sum)
+
+ // init statement is optional
+ sum2 := 1
+ for ; sum2 < 1000; {
+  sum2 += sum2
+ }
+ fmt.Println(sum2)
+
+ // same than above, simplified with less semi-colon
+ sum3 := 1
+ for sum3 < 1000 {
+  sum3 += sum3
+ }
+ fmt.Println(sum3)
+ 
+ // below this is an infinite loop (don't do that!)
+ for {
+ }
+
+}
+```
+
+### IF statement
+
+* Syntax of IF statements:
+
+```Golang
+package main
+
+import (
+ "fmt"
+ "math"
+)
+
+func sqrt(x float64) string {
+ if x < 0 {
+  return sqrt(-x) + "i"
+ }
+ return fmt.Sprint(math.Sqrt(x))
+}
+
+func pow(x, n, lim float64) float64 {
+ /**
+  * Like for, the if statement can start with a
+  * short statement to execute before the condition.
+  */
+ if alpha := math.Pow(x, n); alpha < lim {
+  return alpha
+ }
+ // fmt.Printf("// variable 'alpha' does not exist here: %v", alpha)
+ return lim
+}
+
+func pow2(x, n, lim float64) float64 {
+ if v := math.Pow(x, n); v < lim {
+  return v
+ } else {
+  fmt.Printf("%g >= %g\n", v, lim)
+ }
+ // can't use v here, though
+ return lim
+}
+
+func main() {
+ fmt.Println(sqrt(2), sqrt(-4))
+ fmt.Println(
+  pow(3, 2, 10),
+  pow(3, 3, 20),
+  pow2(3, 3, 20),
+ )
+}
+```
+
+### Switch/case statement
+
+* The switch statement syntax in Golang does not need the `break` keyword, like in many other languages:
+
+```Golang
+package main
+
+import (
+ "fmt"
+ "runtime"
+    "time"
+)
+
+func main() {
+ fmt.Print("Go runs on ")
+ switch os := runtime.GOOS; os {
+ case "darwin":
+  fmt.Println("OS X.")
+ case "linux":
+  fmt.Println("Linux.")
+ case "windows":
+  fmt.Println("OS X.")
+ default:
+  // freebsd, openbsd,
+  // plan9, windows...
+  fmt.Printf("%s.\n", os)
+ }
+    /// another switch syntax:
+
+ fmt.Println("When's Saturday?")
+ today := time.Now().Weekday()
+ switch time.Saturday {
+ case today + 0:
+  fmt.Println("Today.")
+ case today + 1:
+  fmt.Println("Tomorrow.")
+ case today + 2:
+  fmt.Println("In two days.")
+ default:
+  fmt.Println("Too far away.")
+ }
+
+    /////
+    // a third syntax of switch statement, neat
+    // way to write an if with many else:
+ t := time.Now()
+ switch {
+ case t.Hour() < 12:
+  fmt.Println("Good morning!")
+ case t.Hour() < 17:
+  fmt.Println("Good afternoon.")
+ default:
+  fmt.Println("Good evening.")
+ }
+}
+```
+
+### The `defer` keyword (and Panic and Recover)
+
+A `defer` statement defers the execution of a function until the surrounding function returns.
+
+The deferred call's arguments are evaluated immediately, but the function call is not executed until the surrounding function returns.
+
+Deferred function calls are pushed onto a stack. When a function returns, its deferred calls are executed in last-in-first-out order.
+
+For example:
+
+```Golang
+package main
+
+import "fmt"
+
+func main() {
+    // will print "world", only after the 
+    // [main] funtion returns
+ defer fmt.Println("after world 2")
+ defer fmt.Println("after world 1")
+ defer fmt.Println("world")
+
+ fmt.Println("hello")
+}
+```
+
+Defer is commonly used to simplify functions that perform various clean-up actions. typical example:
+
+```Golang
+package main
+
+import (
+ "fmt"
+ "os"
+ "io"
+)
+
+/**
+ * The below function always returns 2.
+ * This function increments the 
+ * return value "i" AFTER the surrounding function returns.
+ * Thus, this function returns 2.
+ * This is convenient for modifying the error return value 
+ * of a function;
+ */
+func c() (i int) {
+    defer func() { i++ }()
+    return 1
+}
+func f() {
+    defer func() {
+        if r := recover(); r != nil {
+            fmt.Println("Recovered in f", r)
+        }
+    }()
+    fmt.Println("Calling g.")
+    g(0)
+    fmt.Println("Returned normally from g.")
+}
+
+func g(i int) {
+    if i > 3 {
+        fmt.Println("Panicking!")
+        panic(fmt.Sprintf("%v", i))
+    }
+    defer fmt.Println("Defer in g", i)
+    fmt.Println("Printing in g", i)
+    g(i + 1)
+}
+
+func CopyFile(dstName, srcName string) (written int64, err error) {
+    src, err := os.Open(srcName)
+    if err != nil {
+        return
+    }
+    //////
+    // below deferred call, is useful: if the os.Create 
+    // function call fails, then the file will
+    // still be closed, after copyFile function returns.
+    defer src.Close()
+
+    dst, err := os.Create(dstName)
+    if err != nil {
+        return
+    }
+    defer dst.Close()
+
+    return io.Copy(dst, src)
+}
+
+func main() {
+    // will print "world", only after the 
+    // [main] funtion returns
+ defer fmt.Println("after world 2")
+ defer fmt.Println("after world 1")
+ defer fmt.Println("world")
+
+ fmt.Println("hello")
+
+    CopyFile("./README.md", "README.copied.md")
+    f()
+    fmt.Println("Returned normally from f.")
+ fmt.Printf("The c() function returns: %v \n", c())
+}
+
+```
+
+**`Panic`** is a built-in function that stops the ordinary flow of control and begins panicking. When the function `F` calls panic, execution of `F` stops, any deferred functions in `F` are executed normally, and then `F` returns to its caller. To the caller, `F` then behaves like a call to panic. The process continues up the stack until all functions in the current goroutine have returned, at which point the program crashes. Panics can be initiated by invoking panic directly. They can also be caused by runtime errors, such as out-of-bounds array accesses.
+
+**`Recover`** is a built-in function that regains control of a panicking goroutine. Recover is only useful inside deferred functions. During normal execution, a call to recover will return nil and have no other effect. If the current goroutine is panicking, a call to recover will capture the value given to panic and resume normal execution.
+
+_NEXT TODO_: <https://go.dev/tour/moretypes/1>
