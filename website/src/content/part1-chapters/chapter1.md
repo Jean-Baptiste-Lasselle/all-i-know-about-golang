@@ -499,3 +499,7 @@ The pointer of a variable is the address, in memory, where the value of that var
 Unlike C, Go has no pointer arithmetic.
 
 _NEXT TODO_: <https://go.dev/tour/moretypes/2>
+
+<!--
+Kept for later: creating methods inside of a type starts here (with the concept of a receiver of a method): <https://go.dev/tour/methods/1>
+-->
