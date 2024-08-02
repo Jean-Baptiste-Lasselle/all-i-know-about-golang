@@ -28,6 +28,7 @@ index: 1
 * [ ] see all types of loops in Golang (for while foreach iterators in relation with ?)
 * [ ] network programming in golang ? How to send/receive ARP / ICMP /  IP / TCP / UDP ? implement a wake on lan
 * [ ] What about multi threading and semaphores in Golang ?
+* [ ] How to define orders for values of a given type: https://go.dev/blog/comparable
 <!--
 * [ ] cdcscsd
 * [x] cdcscsd
@@ -37,6 +38,7 @@ index: 1
 
 ## Design Patterns Questions
 
+* [ ] How to add a good logging system in my golang app ? How to use the slog framework, see https://go.dev/blog/slog 
 * [ ] How can I implement inversion of control/Dependency Injection in Golang? (patterns, frameworks?)
 * [ ] A typical CI/CD for a CLI app ? for a webb app ?
 * [ ] A typical CI/CD for a terraform provider?
