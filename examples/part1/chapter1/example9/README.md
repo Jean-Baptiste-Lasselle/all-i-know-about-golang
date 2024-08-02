@@ -2,6 +2,8 @@
 
 This app is a demo of the different `defer` statements forms in `Golang`.
 
+And the use of `recover` and `recover` (a bit like `try`/`catch`/`throw`)
+
 ## Build it
 
 ```bash
