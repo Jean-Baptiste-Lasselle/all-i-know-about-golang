@@ -526,9 +526,59 @@ func (p *pokusProvider) Configure(ctx context.Context, req provider.ConfigureReq
 ```
 
 
-TO complete with new datasource added
+Then, I added a new datasource, by adding its definition in a new go source file `internal/provider/projects_data_source.go`, with the following content:
 
-then run the tofu:
+```Golang
+package provider
+
+import (
+    "context"
+
+    "github.com/hashicorp/terraform-plugin-framework/datasource"
+    "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
+)
+
+// Ensure the implementation satisfies the expected interfaces.
+var (
+	_ datasource.DataSource = &projectsDataSource{}
+  )
+
+// NewProjectsDataSource is a helper function to simplify the provider implementation.
+func NewProjectsDataSource() datasource.DataSource {
+    return &projectsDataSource{}
+}
+
+// projectsDataSource is the data source implementation.
+type projectsDataSource struct{}
+
+// Metadata returns the data source type name.
+func (d *projectsDataSource) Metadata(_ context.Context, req datasource.MetadataRequest, resp *datasource.MetadataResponse) {
+    resp.TypeName = req.ProviderTypeName + "_projects"
+}
+
+// Schema defines the schema for the data source.
+func (d *projectsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
+    resp.Schema = schema.Schema{}
+}
+
+// Read refreshes the Terraform state with the latest data
+func (d *projectsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+}
+```
+
+And adding the reference to that new datasource in the `internal/provider/provider.go`, like this:
+
+```Golang
+// DataSources defines the data sources implemented in the provider.
+func (p *pokusProvider) DataSources(_ context.Context) []func() datasource.DataSource {
+    return []func() datasource.DataSource {
+        NewProjectsDataSource,
+    }
+}
+```
+
+
+then run the `tofu`:
 
 ```Powershell
 $env:POKUS_HOST = "http://api.pesto.io:3000"
@@ -543,7 +593,7 @@ export POKUS_HOST="http://api.pesto.io:3000"
 export POKUS_USERNAME="education"
 export POKUS_PASSWORD="test123"
 tofu plan
-
+terraform apply -auto-approve
 ```
 
 Note that then, I get an error with the HTTP call to the pesto API: a 404 of course, because my API has no authentication endpoint.
@@ -553,3 +603,26 @@ I will have to fix that, one way, or another (is it possible to implement a terr
 Response: Yes! The authenticationwas made mandatory only in the go client of the REST API, with the signin method, I just commented it and it all worked, the GET Http call to the API successfully fetched the pesto-projects!
 
 Actually not, the go client is just created: the datasource alone, even with a terraform output, does not fetch the api, it obviously is based only on the terraform state.
+
+before getting to next step, note that instead of using environment variables, the host, user and password configuration parameters can be set in the providers configuration like this:
+
+```Terraform
+terraform {
+  required_providers {
+    pokus = {
+      source = "pokus-io.io/terraform/pokus"
+    }
+  }
+}
+
+provider "pokus" {
+    // host = "http://api.pesto.io:3000"
+    // username = "education"
+    // password = "sdsddg"
+  host     = "http://api.pesto.io:3000"
+  username = "education"
+  password = "test123"
+}
+
+```
+
