@@ -324,12 +324,12 @@ What tells us that the setup is successful, is that the DEBUG logs will confirm 
 2024-08-03T13:09:43.381+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
 ```
 
-### Step 5: Configure the client
+### Step 5: Configure the client of the provider
 
 The client is what is going to connect to my REST API.
 It will hold the hostname, port num, URL to the REST API, and if necessary the auth credentials.
 
-ALl the code of that client will be in the `provider.go` source code file.
+All the code of that client will be in the `provider.go` source code file.
 
 The client's design is simple:
 
@@ -625,4 +625,145 @@ provider "pokus" {
 }
 
 ```
+
+### Step 6: Complete the first Datasource
+
+In the previous step, to be able to test running the tofu terraformation, we added a first "dummy" datasource:
+* That datasource was qualified dummy, because it didn't fetch any data from the rest API, as we run `tofu apply`.
+* We will now complete the implementation of that data source, to fix that.
+* note that i used version v0.0.3 of the [`pesto-api-client-go`](https://github.com/3forges/pesto-api-client-go).
+
+I only changed the source code, of the `./internal/provider/projects_data_source.go` file, to be :
+
+```Golang
+package pesto
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"strings"
+)
+
+// GetPestoProjects - Returns list of PestoProjects (no auth required)
+func (c *Client) GetPestoProjects() ([]PestoProject, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/pesto-project", c.HostURL), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	PestoProjects := []PestoProject{}
+	err = json.Unmarshal(body, &PestoProjects)
+	if err != nil {
+		return nil, err
+	}
+
+	return PestoProjects, nil
+}
+
+// GetPestoProject - Returns specific PestoProject (no auth required)
+func (c *Client) GetPestoProject(PestoProjectID string) ([]PestoProject, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/pesto-project/%s", c.HostURL, PestoProjectID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	PestoProjects := []PestoProject{}
+	err = json.Unmarshal(body, &PestoProjects)
+	if err != nil {
+		return nil, err
+	}
+
+	return PestoProjects, nil
+}
+
+/*
+// GetPestoProjectIngredients - Returns list of PestoProject ingredients (no auth required)
+func (c *Client) GetPestoProjectIngredients(PestoProjectID string) ([]Ingredient, error) {
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/PestoProjects/%s/ingredients", c.HostURL, PestoProjectID), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	ingredients := []Ingredient{}
+	err = json.Unmarshal(body, &ingredients)
+	if err != nil {
+		return nil, err
+	}
+
+	return ingredients, nil
+}
+
+*/
+// CreatePestoProject - Create new PestoProject
+func (c *Client) CreatePestoProject(project PestoProject, authToken *string) (*PestoProject, error) {
+	rb, err := json.Marshal(project)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/pesto-project", c.HostURL), strings.NewReader(string(rb)))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := c.doRequest(req, authToken)
+	if err != nil {
+		return nil, err
+	}
+
+	newPestoProject := PestoProject{}
+	err = json.Unmarshal(body, &newPestoProject)
+	if err != nil {
+		return nil, err
+	}
+	return &newPestoProject, nil
+}
+
+```
+
+And then:
+
+* I created 2 pesto projects using the graphQL Appolo client to hit the pesto api:
+
+![Create pesto projects with GraphQL](./images/incredible_first_datasource_successfully_fetches_a_pesto_project1.PNG)
+
+![Created pesto projects with GraphQL](./images/incredible_first_datasource_successfully_fetches_a_pesto_project0.PNG)
+
+* I ran again the `tofu apply`, and here was the awesome result:
+
+![result first datasource pesto projects](./images/incredible_first_datasource_successfully_fetches_a_pesto_project2.PNG)
+
+I here note the following caveats:
+
+* my only issues were about the ID field of the Project entity of the Pesto API
+* I learned that :
+  * The ID field defined in the `type projectsModel struct`, `ID  types.String 'tfsdk:"id"'`, must match the ID field defined in the `Schema` function, `"id": schema.StringAttribute{`.
+  * both of those must comply with these rules:
+    * The string value on the right of `ID  types.String 'tfsdk:"id"'`, must not start with an underscore character, and must contain only lowercase characters.
+    * The string value on the right of `"id": schema.StringAttribute{`, must not start with an underscore character, and must contain only lowercase characters.
+
+
+### Step 7: Implement logging
+
+TODO <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-logging>
+
+### Step 8: Implement logging
+
+TODO
 
