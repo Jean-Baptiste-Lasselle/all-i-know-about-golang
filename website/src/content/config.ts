@@ -14,6 +14,7 @@ const chaptersCollection = defineCollection({
 
 // 3. Export a single `collections` object to register your collection(s)
 export const collections = {
+  'go-terraform-tofu': chaptersCollection,
   'questionomicon': chaptersCollection,
   'part1-chapters': chaptersCollection,
   'part2-chapters': chaptersCollection,

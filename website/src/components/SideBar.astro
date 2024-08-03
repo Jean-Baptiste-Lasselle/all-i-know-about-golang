@@ -1,6 +1,12 @@
 ---
 import { getCollection } from "astro:content";
 
+
+
+const goTerraform = (await getCollection("go-terraform-tofu")).sort(
+  (a, b) => a.data.index - b.data.index
+);
+
 const questionomicon = (await getCollection("questionomicon")).sort(
   (a, b) => a.data.index - b.data.index
 );
@@ -96,6 +102,34 @@ class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-
     }
   </div>
 
+
+  <!-- goTerraform -->
+  <div
+  class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-2 mt-2"
+>
+  <!-- div class="flex justify-center px-4 py-6 bg-base-200" -->
+  <div class="flex justify-center px-4 py-6 bg-accent rounded-md">
+    <h3>GO Tofu (R.I.P. terraform)</h3>
+  </div>
+
+  {
+    goTerraform.map((goTerraformChapter) => (
+      <li>
+        <a href={`/go-tf/${goTerraformChapter.slug}`}>{goTerraformChapter.data.title}</a>
+        {
+          /**
+           *
+           */
+          // <time datetime={part2Chapter.data.publishedDate.toISOString()}>
+          //   {part2Chapter.data.publishedDate.toDateString()}
+          // </time>
+        }
+      </li>
+    ))
+  }
+</div>
+
+  <!-- demo content management -->
   <div
     class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-2 mt-2"
   >
@@ -120,4 +154,6 @@ class="p-2 rounded-md border-2 border-accent hover:border-accent bg-base-900 mb-
       ))
     }
   </div>
+
+
 </ul>
