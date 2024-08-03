@@ -550,3 +550,6 @@ Note that then, I get an error with the HTTP call to the pesto API: a 404 of cou
 
 I will have to fix that, one way, or another (is it possible to implement a terraform provider without authentication? )
 
+Response: Yes! The authenticationwas made mandatory only in the go client of the REST API, with the signin method, I just commented it and it all worked, the GET Http call to the API successfully fetched the pesto-projects!
+
+Actually not, the go client is just created: the datasource alone, even with a terraform output, does not fetch the api, it obviously is based only on the terraform state.
