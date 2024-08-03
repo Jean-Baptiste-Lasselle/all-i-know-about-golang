@@ -11,7 +11,18 @@ index: 0
 
 ## First try: the official terraform tutorial
 
-In tis chapter, I will try and implement a tofu provider, using hashcorp's official <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-provider>
+In this chapter, I will try and implement a tofu provider, using hashcorp's official <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-provider>
+
+
+### Foreword
+
+Note that the terraform provider implemented here, is implemented using the `SDKv2`, which is the "ancient" legacy framework that is stil maintained. That, because the scaffolding project, and the hashicorp docuementation are both based on that legacy ancient `SDKv2`.
+
+A second version will use the more recent terraform plugins framework.
+
+About those two version of frameworks, see <https://developer.hashicorp.com/terraform/plugin/framework-benefits>
+
+### Step 0: spinup the project
 
 * There:
 
@@ -761,7 +772,51 @@ I here note the following caveats:
 
 ### Step 7: Implement logging
 
-TODO <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-logging>
+TOCOMPLETE <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-logging>
+
+It's very easy, basically you add in imported packages `"github.com/hashicorp/terraform-plugin-log/tflog"`
+
+And then you can use:
+
+```Golang
+
+// Read refreshes the Terraform state with the latest data
+func (d *projectsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
+	var state projectsDataSourceModel
+	tflog.Info(ctx, "Pokus Terraform Provider - Here is an example log done just before calling [client.GetPestoProjects()] for [pokus_projects] datasource")
+	// [...]
+}
+```
+
+To see those logs, you would still have to set log level to INFO, e.g. with `export TF_LOG="INFO"`.
+
+There are more advanced features to `tflog`, like structured logs, log filtering, and masking secret values, like this, in the `internal/provider/provider.go` source code file:
+
+```Golang
+func (p *pokusProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	// Retrieve provider data from configuration
+	var config pokusProviderModel
+
+    /// [...]
+
+	if resp.Diagnostics.HasError() {
+		return
+	}
+    ctx = tflog.SetField(ctx, "pokus_host", host)
+    ctx = tflog.SetField(ctx, "pokus_username", username)
+    ctx = tflog.SetField(ctx, "pokus_password", password)
+    ctx = tflog.MaskFieldValuesWithFieldKeys(ctx, "pokus_password")
+
+    tflog.Debug(ctx, "Creating Pesto API client")
+
+    /// [...]
+
+}
+```
+
+Example result :
+
+![result logging](./images/example_tflogging_structured_and_with_masked_password.PNG)
 
 ### Step 8: Implement logging
 
