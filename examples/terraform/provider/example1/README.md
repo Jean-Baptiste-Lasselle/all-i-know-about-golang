@@ -100,6 +100,7 @@ tofu validate
 tofu fmt
 
 tofu plan
+tofu apply -auto-approve
 
 ```
 
@@ -118,3 +119,4 @@ What tells us that the setup is successful, is that the DEBUG logs will confirm 
 ╵
 2024-08-03T13:09:43.381+0200 [DEBUG] provider.stdio: received EOF, stopping recv loop: err="rpc error: code = Unavailable desc = error reading from server: EOF"
 ```
+

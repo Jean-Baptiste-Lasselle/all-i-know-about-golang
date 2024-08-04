@@ -818,7 +818,9 @@ Example result :
 
 ![result logging](./images/example_tflogging_structured_and_with_masked_password.PNG)
 
-### Step 8: Implement logging
+### Step 8: Create and read resources
 
-TODO
+* <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-resource-create>
+
+
 
