@@ -833,3 +833,45 @@ Finally, Here is the beautiful result I got, as all was fixed:
 ![awesome terraformed pesto project WOOOwWWW](./images/terraforming_a_pesto_project_works_awesomeeeee.PNG)
 
 Its' so beautiful.
+
+
+Worth noting: In my tofu terraofrmation code, I created a dependency between the `pokus_projects` **datasource**, and the 3 `pokus_project` **resources**, to make sure that the datasource is fetched from REST API only after the resources are created in the rest api:
+
+* In `main.tf`:
+
+```Tf
+resource "pokus_project" "godzilla_project" {
+  name                 = "godzilla"
+  description          = "a first example project to test creating a project with OpenTOFU the terraformation king"
+  git_service_provider = "giteaJapan"
+  git_ssh_uri          = "git@github.com:3forges/godzilla.git"
+}
+
+resource "pokus_project" "mothra_project" {
+  name                 = "mothra"
+  description          = "a second example project to test creating a project with OpenTOFU the terraformation king"
+  git_service_provider = "giteaJapan"
+  git_ssh_uri          = "git@github.com:3forges/mothra.git"
+
+}
+
+resource "pokus_project" "gidhora_project" {
+  name                 = "gidhora"
+  description          = "a third example project to test creating a project with OpenTOFU the terraformation king"
+  git_service_provider = "giteaJapan"
+  git_ssh_uri          = "git@github.com:3forges/gidhora.git"
+}
+```
+
+* In `datasource.tf`:
+
+```Tf
+data "pokus_projects" "example2" {
+  depends_on = [
+    pokus_project.godzilla_project,
+    pokus_project.mothra_project,
+    pokus_project.gidhora_project,
+  ]
+}
+
+```
