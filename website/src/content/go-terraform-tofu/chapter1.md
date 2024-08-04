@@ -21,6 +21,12 @@ A second version will use the more recent terraform plugins framework.
 
 About those two version of frameworks, see <https://developer.hashicorp.com/terraform/plugin/framework-benefits>
 
+
+OKKK I know:
+* ACtually the tutorial i followed uses the new Teraform Plugin framework, so the code i wrote should be ok 
+* but the scaffolding project template i sued was made with the older SDK v2
+* now, there is a project tempalte using the new terraform plugin framework, not the old sdk v2, that is the code in this folder exactly, that i shoudl trun into a real scaffolding project template: <https://github.com/hashicorp/terraform-provider-hashicups/tree/main/12-final>
+
 ### Step 0: spinup the project
 
 * There:
