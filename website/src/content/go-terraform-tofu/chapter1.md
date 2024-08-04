@@ -834,8 +834,7 @@ Finally, Here is the beautiful result I got, as all was fixed:
 
 Its' so beautiful.
 
-
-Worth noting: In my tofu terraofrmation code, I created a dependency between the `pokus_projects` **datasource**, and the 3 `pokus_project` **resources**, to make sure that the datasource is fetched from REST API only after the resources are created in the rest api:
+**Worth noting** - In my `tofu` terraformation code, I created a dependency between the `pokus_projects` **datasource**, and the 3 `pokus_project` **resources**, to make sure that the datasource is fetched from REST API only after the resources are created in the rest api:
 
 * In `main.tf`:
 
@@ -875,3 +874,191 @@ data "pokus_projects" "example2" {
 }
 
 ```
+
+### Step 9: Update resources
+
+* <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-resource-update>
+
+Oh my gosh, this one was really crazy to find: Not so hard to find, in only 2 hours I found the issue, because I know very well my API, but here is what happened:
+
+* First, As I strictly follow the source code like is shown in the official tutorial, the big problem is that the API kept answering that the ID in the request was empty
+* I cehcked with logs and it was indeed the case: So I seached why
+* Well its simple and makes so much sense: in the `plan`, you only have the properties that are mentioned in the `*.tf` file. And well I did not write the ID in the `*.tf` file, because if the the auto generated primary key in the API database. 
+* Yet, my model does include the ID, and the API returns the object ID which is created, modified, or updated.
+* So well in the golang code, the ID was NOT there, it could not be there, since it is not in the `*.tf` file.
+* And therefore, in the golang code:
+  * I retrieve all the properties of the resoruces, to update them, **from the plan**
+  * But I retireve the reource ID (the ID of the Pesto Project) **from the state, NOT from the plan**.
+
+And there it all worked, and I ended up with the following update method, which is the only thing I had to add in my source code (in `internal/provider/project_resource.go`), to add the update feature:
+
+```Golang
+// Update updates the resource and sets the updated Terraform state on success.
+func (r *projectResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+ //func (r *orderResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+ // Retrieve values to update from plan (not state)
+ var plan projectResourceModel
+ diags := req.Plan.Get(ctx, &plan)
+ resp.Diagnostics.Append(diags...)
+ if resp.Diagnostics.HasError() {
+  return
+ }
+
+ // retireve project ID from state (not plan)
+ var state projectResourceModel
+ stateDiags := req.State.Get(ctx, &state)
+ resp.Diagnostics.Append(stateDiags...)
+
+ if resp.Diagnostics.HasError() {
+  return
+ }
+
+ // Generate API request body from plan
+
+ apiRequestBody := pesto.UpdatePestoProjectPayload{
+  // ID:                   plan.ID.ValueString(),
+  ID:                   state.ID.ValueString(),
+  Name:                 plan.Name.ValueString(),
+  Description:          plan.Description.ValueString(),
+  Git_ssh_uri:          plan.Git_ssh_uri.ValueString(),
+  Git_service_provider: plan.Git_service_provider.ValueString(),
+ }
+
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (plan.)ID : %v \n", plan.ID.ValueString()))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (state.)ID : %v \n", state.ID.ValueString()))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (plan.)name : %v \n", plan.Name))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)ID : %v \n", apiRequestBody.ID))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)Name : %v \n", apiRequestBody.Name))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)Git_ssh_uri : %v \n", apiRequestBody.Git_ssh_uri))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)Description : %v \n", apiRequestBody.Description))
+
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project with payload : %v \n", apiRequestBody))
+ // Update existing Pesto Project
+ project, err := r.client.UpdatePestoProject(ctx, apiRequestBody, nil)
+
+ tflog.Debug(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - here is the tfsdk response object: %v", resp))
+ tflog.Debug(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - here is the project returned from Pesto API: %v", project))
+
+ var isUpdatedProjectNil string
+
+ if project != nil {
+  isUpdatedProjectNil = "NO updated pesto project object is not NIL"
+ } else {
+  isUpdatedProjectNil = "YES updated pesto project object is NIL!"
+ }
+ tflog.Debug(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Is the updated project returned from Pesto API NIL ?: %v", isUpdatedProjectNil))
+
+ // _, err := r.client.UpdatePestoProject(plan.ID.ValueString(), hashicupsItems)
+ if err != nil {
+  resp.Diagnostics.AddError(
+   "Error Updating Pesto Project",
+   "Could not update order, unexpected error: "+err.Error(),
+  )
+  return
+ }
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Successfully updated pesto project of name : %v \n", project.Name))
+
+ // Update resource state with the Pesto Project returned by the API (mybe that one is not necessary ? I'm not sure, yet)
+ plan.ID = types.StringValue(plan.ID.ValueString())
+ plan = projectResourceModel{
+  ID:                   types.StringValue(project.ID),
+  Name:                 types.StringValue(project.Name),
+  Description:          types.StringValue(project.Description),
+  Git_ssh_uri:          types.StringValue(project.Git_ssh_uri),
+  Git_service_provider: types.StringValue(project.Git_service_provider),
+ }
+ // Update resource state with updated sub-object if
+ // there are some, because sub-objects are not populated.
+ // -----------------------
+ // /!\ /!\ /!\ SO HERE: THIS WOULD MEAN THAT
+ // PESTO API WILL NEED AN ENDPOINT TO
+ // RETRIEVE ALL CONTENT TYPES FROM THEIR
+ // PROJECT ID  (a foreing key in the database of the Pesto API)
+ // -----------------------
+ // - this would also mean that we expect
+ //   that a pesto project has a [content_types] List property,
+ //   that allow creating and updating the content types of a given Pesto Project
+ // >> I have reason to dislike that design
+ // >> Why ?
+ // >> Because I want that a single content-type entity can be reused in several pesto project,
+ // >> so I would have to modify the Pesto API so that a the Content Type Entity has a [project_ids] property, that is an array (or a set) of project IDs.
+ // >> that would mean having an (N <-> N) relation between Pesto Projects and Pesto Content Types.
+ // >> ---
+ // >> Yet, having an (N <-> N) relation between
+ // >> Pesto Projects and Pesto Content Types, is
+ // >> a bit too high a complexity to my taste, and
+ // >> since we are talking about an
+ // >> end user feature, I can think of another design
+ // >> to bring that same reusability for end user:
+ // >>
+ // >> Using the App GUI, The user can "import" a
+ // >> content type, from one project, to another,
+ // >> which is easy to implement only in the GUI
+ // >> presentation layer, and on the API side, it
+ // >> only requires and API endpoint import(contentType PestoContentType, destinationProject PestoProject)
+ // >> ---
+ // >> And at the terraform level, the
+ // >> "pokus_projects" datasource Read method
+ // >> allows to fetch all the content-types of
+ // >> a given project, using the API endpoint to
+ // >> fetch all PestoContentTypes of
+ // >> a given PestoProject's ID
+ // >>
+ // >>
+ // -----------------------
+ // >>
+ // >> So we won't add this for
+ // >> the Pokus Pesto Provider, yet, if
+ // >> we did, it would look like this:
+ // -----------------------
+
+ /*
+  retrievedPestoContentTypes, err := r.client.GetPestoContentTypes(plan.ID.ValueString())
+  if err != nil {
+   resp.Diagnostics.AddError(
+    "Error Fetching Pesto Content Types",
+    "Could not read Pesto Content Types for Pesto Project ID "+plan.ID.ValueString()+": "+err.Error(),
+   )
+   return
+  }
+ */
+
+ // Update resource state with updated Pesto Content Types
+ // -
+ // In [projectResourceModel] you would
+ // have a [PestoContentTypes] Field, lke you seee commented above.
+ // -
+ // Also a pestoContentTypeModel struct would be defined, like the one you can see in this source file, commented.
+ // And also the resource Schema would have a Nested List like the one you can see in this source file, commented.
+
+ /*
+  plan.PestoContentTypes = []pestoContentTypeModel{}
+
+  for _, contentTypeItem := range retrievedPestoContentTypes {
+   plan.PestoContentTypes = append(plan.PestoContentTypes, pestoContentTypeModel{
+    ID:                     types.StringValue(contentTypeItem.ID),
+    Project_id:             types.StringValue(contentTypeItem.Name),
+    Name:                   types.StringValue(contentTypeItem.Teaser),
+    Frontmatter_definition: types.StringValue(contentTypeItem.Description),
+    Description:            types.StringValue(contentTypeItem.Price),
+   })
+  }
+ */
+ // And finally update last updated timestamp
+ plan.LastUpdated = types.StringValue(time.Now().Format(time.RFC850))
+
+ // -
+ diags = resp.State.Set(ctx, plan)
+ resp.Diagnostics.Append(diags...)
+ if resp.Diagnostics.HasError() {
+  return
+ }
+}
+
+```
+
+Et voilà!
+
+Awesome result (note in the below test i only changed the description of godzilla and mothra):
+
+![awesome update result](./images/terraforming_a_pesto_project_works_awesomeeeee_update.PNG)
