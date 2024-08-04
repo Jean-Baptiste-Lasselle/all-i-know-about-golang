@@ -13,7 +13,6 @@ index: 0
 
 In this chapter, I will try and implement a tofu provider, using hashcorp's official <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-provider>
 
-
 ### Foreword
 
 Note that the terraform provider implemented here, is implemented using the `SDKv2`, which is the "ancient" legacy framework that is stil maintained. That, because the scaffolding project, and the hashicorp docuementation are both based on that legacy ancient `SDKv2`.
@@ -44,19 +43,18 @@ go mod tidy
 
 Note there that at the date I write this, 03/08/2024, the <https://github.com/hashicorp/terraform-provider-scaffolding-framework> has no change of licence, like the new business license for hashicorp. It has a mozilla public license.
 
-
 ### Step 1: reset internal dependencies
 
 Open the `main.go` file in the `terraform-provider-pokus` repository's root directory and replace the import declaration that you find :
 
 ```Golang
 import (
-	"context"
-	"flag"
-	"log"
+ "context"
+ "flag"
+ "log"
 
-	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/hashicorp/terraform-provider-scaffolding-framework/internal/provider"
+ "github.com/hashicorp/terraform-plugin-framework/providerserver"
+ "github.com/hashicorp/terraform-provider-scaffolding-framework/internal/provider"
 )
 ```
 
@@ -84,12 +82,9 @@ I will try with my own api available at :
 
 if I experience any issue, i can always use the "hashicups" rest api from the tutorial.
 
-
-
 ### Step 3: The most simple `provider.go` and `main.go`
 
 Edit the `provider.go` and `main.go` files, with the below content:
-
 
 * In `provider.go`:
 
@@ -184,12 +179,12 @@ import (
 //go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate -provider-name scaffolding
 
 var (
-	// these will be set by the goreleaser configuration
-	// to appropriate values for the compiled binary.
-	version string = "dev"
+ // these will be set by the goreleaser configuration
+ // to appropriate values for the compiled binary.
+ version string = "dev"
 
-	// goreleaser can pass other information to the main package, such as the specific commit
-	// https://goreleaser.com/cookbooks/using-main.version/
+ // goreleaser can pass other information to the main package, such as the specific commit
+ // https://goreleaser.com/cookbooks/using-main.version/
 )
 func main() {
     var debug bool
@@ -217,7 +212,6 @@ func main() {
 ```
 
 ### Step 4: Prepare the `Tofu` dev env
-
 
 Cd into the `./examples/terraform/provider/example1/` folder of this repo.
 
@@ -371,20 +365,20 @@ Then I edit my `provider.go` to add the **`Configure`** function (and VERY IMPOR
 
 // Schema defines the provider-level schema for configuration data.
 func (p *pokusProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
-	resp.Schema = schema.Schema{
-		Attributes: map[string]schema.Attribute{
-			"host": schema.StringAttribute{
-				Optional: true,
-			},
-			"username": schema.StringAttribute{
-				Optional: true,
-			},
-			"password": schema.StringAttribute{
-				Optional:  true,
-				Sensitive: true,
-			},
-		},
-	}
+ resp.Schema = schema.Schema{
+  Attributes: map[string]schema.Attribute{
+   "host": schema.StringAttribute{
+    Optional: true,
+   },
+   "username": schema.StringAttribute{
+    Optional: true,
+   },
+   "password": schema.StringAttribute{
+    Optional:  true,
+    Sensitive: true,
+   },
+  },
+ }
 }
 
 
@@ -402,9 +396,9 @@ func (p *pokusProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp
 // }
 // pokusProviderModel maps provider schema data to a Go type.
 type pokusProviderModel struct {
-	Host     types.String `tfsdk:"host"`
-	Username types.String `tfsdk:"username"`
-	Password types.String `tfsdk:"password"`
+ Host     types.String `tfsdk:"host"`
+ Username types.String `tfsdk:"username"`
+ Password types.String `tfsdk:"password"`
 }
 
 func (p *pokusProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
@@ -412,7 +406,7 @@ func (p *pokusProvider) Configure(ctx context.Context, req provider.ConfigureReq
     var config pokusProviderModel
     diags := req.Config.Get(ctx, &config)
     resp.Diagnostics.Append(diags...)
-	
+ 
     if resp.Diagnostics.HasError() {
         return
     }
@@ -536,7 +530,6 @@ func (p *pokusProvider) Configure(ctx context.Context, req provider.ConfigureReq
 
 ```
 
-
 Then, I added a new datasource, by adding its definition in a new go source file `internal/provider/projects_data_source.go`, with the following content:
 
 ```Golang
@@ -551,7 +544,7 @@ import (
 
 // Ensure the implementation satisfies the expected interfaces.
 var (
-	_ datasource.DataSource = &projectsDataSource{}
+ _ datasource.DataSource = &projectsDataSource{}
   )
 
 // NewProjectsDataSource is a helper function to simplify the provider implementation.
@@ -587,7 +580,6 @@ func (p *pokusProvider) DataSources(_ context.Context) []func() datasource.DataS
     }
 }
 ```
-
 
 then run the `tofu`:
 
@@ -640,6 +632,7 @@ provider "pokus" {
 ### Step 6: Complete the first Datasource
 
 In the previous step, to be able to test running the tofu terraformation, we added a first "dummy" datasource:
+
 * That datasource was qualified dummy, because it didn't fetch any data from the rest API, as we run `tofu apply`.
 * We will now complete the implementation of that data source, to fix that.
 * note that i used version v0.0.3 of the [`pesto-api-client-go`](https://github.com/3forges/pesto-api-client-go).
@@ -650,100 +643,100 @@ I only changed the source code, of the `./internal/provider/projects_data_source
 package pesto
 
 import (
-	"encoding/json"
-	"fmt"
-	"net/http"
-	"strings"
+ "encoding/json"
+ "fmt"
+ "net/http"
+ "strings"
 )
 
 // GetPestoProjects - Returns list of PestoProjects (no auth required)
 func (c *Client) GetPestoProjects() ([]PestoProject, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/pesto-project", c.HostURL), nil)
-	if err != nil {
-		return nil, err
-	}
+ req, err := http.NewRequest("GET", fmt.Sprintf("%s/pesto-project", c.HostURL), nil)
+ if err != nil {
+  return nil, err
+ }
 
-	body, err := c.doRequest(req, nil)
-	if err != nil {
-		return nil, err
-	}
+ body, err := c.doRequest(req, nil)
+ if err != nil {
+  return nil, err
+ }
 
-	PestoProjects := []PestoProject{}
-	err = json.Unmarshal(body, &PestoProjects)
-	if err != nil {
-		return nil, err
-	}
+ PestoProjects := []PestoProject{}
+ err = json.Unmarshal(body, &PestoProjects)
+ if err != nil {
+  return nil, err
+ }
 
-	return PestoProjects, nil
+ return PestoProjects, nil
 }
 
 // GetPestoProject - Returns specific PestoProject (no auth required)
 func (c *Client) GetPestoProject(PestoProjectID string) ([]PestoProject, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/pesto-project/%s", c.HostURL, PestoProjectID), nil)
-	if err != nil {
-		return nil, err
-	}
+ req, err := http.NewRequest("GET", fmt.Sprintf("%s/pesto-project/%s", c.HostURL, PestoProjectID), nil)
+ if err != nil {
+  return nil, err
+ }
 
-	body, err := c.doRequest(req, nil)
-	if err != nil {
-		return nil, err
-	}
+ body, err := c.doRequest(req, nil)
+ if err != nil {
+  return nil, err
+ }
 
-	PestoProjects := []PestoProject{}
-	err = json.Unmarshal(body, &PestoProjects)
-	if err != nil {
-		return nil, err
-	}
+ PestoProjects := []PestoProject{}
+ err = json.Unmarshal(body, &PestoProjects)
+ if err != nil {
+  return nil, err
+ }
 
-	return PestoProjects, nil
+ return PestoProjects, nil
 }
 
 /*
 // GetPestoProjectIngredients - Returns list of PestoProject ingredients (no auth required)
 func (c *Client) GetPestoProjectIngredients(PestoProjectID string) ([]Ingredient, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/PestoProjects/%s/ingredients", c.HostURL, PestoProjectID), nil)
-	if err != nil {
-		return nil, err
-	}
+ req, err := http.NewRequest("GET", fmt.Sprintf("%s/PestoProjects/%s/ingredients", c.HostURL, PestoProjectID), nil)
+ if err != nil {
+  return nil, err
+ }
 
-	body, err := c.doRequest(req, nil)
-	if err != nil {
-		return nil, err
-	}
+ body, err := c.doRequest(req, nil)
+ if err != nil {
+  return nil, err
+ }
 
-	ingredients := []Ingredient{}
-	err = json.Unmarshal(body, &ingredients)
-	if err != nil {
-		return nil, err
-	}
+ ingredients := []Ingredient{}
+ err = json.Unmarshal(body, &ingredients)
+ if err != nil {
+  return nil, err
+ }
 
-	return ingredients, nil
+ return ingredients, nil
 }
 
 */
 // CreatePestoProject - Create new PestoProject
 func (c *Client) CreatePestoProject(project PestoProject, authToken *string) (*PestoProject, error) {
-	rb, err := json.Marshal(project)
-	if err != nil {
-		return nil, err
-	}
+ rb, err := json.Marshal(project)
+ if err != nil {
+  return nil, err
+ }
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/pesto-project", c.HostURL), strings.NewReader(string(rb)))
-	if err != nil {
-		return nil, err
-	}
+ req, err := http.NewRequest("POST", fmt.Sprintf("%s/pesto-project", c.HostURL), strings.NewReader(string(rb)))
+ if err != nil {
+  return nil, err
+ }
 
-	body, err := c.doRequest(req, authToken)
-	if err != nil {
-		return nil, err
-	}
+ body, err := c.doRequest(req, authToken)
+ if err != nil {
+  return nil, err
+ }
 
-	newPestoProject := PestoProject{}
-	err = json.Unmarshal(body, &newPestoProject)
-	if err != nil {
-		return nil, err
-	}
-	return &newPestoProject, nil
+ newPestoProject := PestoProject{}
+ err = json.Unmarshal(body, &newPestoProject)
+ if err != nil {
+  return nil, err
+ }
+ return &newPestoProject, nil
 }
 
 ```
@@ -769,7 +762,6 @@ I here note the following caveats:
     * The string value on the right of `ID  types.String 'tfsdk:"id"'`, must not start with an underscore character, and must contain only lowercase characters.
     * The string value on the right of `"id": schema.StringAttribute{`, must not start with an underscore character, and must contain only lowercase characters.
 
-
 ### Step 7: Implement logging
 
 TOCOMPLETE <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-logging>
@@ -782,9 +774,9 @@ And then you can use:
 
 // Read refreshes the Terraform state with the latest data
 func (d *projectsDataSource) Read(ctx context.Context, req datasource.ReadRequest, resp *datasource.ReadResponse) {
-	var state projectsDataSourceModel
-	tflog.Info(ctx, "Pokus Terraform Provider - Here is an example log done just before calling [client.GetPestoProjects()] for [pokus_projects] datasource")
-	// [...]
+ var state projectsDataSourceModel
+ tflog.Info(ctx, "Pokus Terraform Provider - Here is an example log done just before calling [client.GetPestoProjects()] for [pokus_projects] datasource")
+ // [...]
 }
 ```
 
@@ -794,14 +786,14 @@ There are more advanced features to `tflog`, like structured logs, log filtering
 
 ```Golang
 func (p *pokusProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	// Retrieve provider data from configuration
-	var config pokusProviderModel
+ // Retrieve provider data from configuration
+ var config pokusProviderModel
 
     /// [...]
 
-	if resp.Diagnostics.HasError() {
-		return
-	}
+ if resp.Diagnostics.HasError() {
+  return
+ }
     ctx = tflog.SetField(ctx, "pokus_host", host)
     ctx = tflog.SetField(ctx, "pokus_username", username)
     ctx = tflog.SetField(ctx, "pokus_password", password)
@@ -825,6 +817,7 @@ Example result :
 TODO: complete full exaplanation descriotion of source code changes.
 
 After I added the source code `project_resource.go`, of the `pokus_project` new resource:
+
 * Note I had to change a lot the source code of the example given if the tutorial, which is really complicated, I think they should give a simple example, and a more complex one, for the developers to understand much better and easier. This means that for the TOFU project, there is a real big need of improving documentation and communication to developers.
 * I had to change my Pesto API:
   * so that when creating a project, the API returns the created project,
@@ -834,7 +827,6 @@ After I added the source code `project_resource.go`, of the `pokus_project` new 
   * adding lots of Debug level logs with tflog was extremely important, but not even enough
   * I also had, to add debug logs in the code of my Pesto API, and to run curl tests to verify for sure, that my API indeed returned the JSON it had to return to my tofu terraformation provider.
   * A third point was a remained unsolved question: I could not at all get any logs from the go client, when runnging `tofu apply` tests. How to do that could be solved by adding logging to a file on the filesystem I think, bu thtat is really not handy, I would like to find another method, and this point has to be worked on, to industrialize writing tofu terraformation providers.
-
 
 Finally, Here is the beautiful result I got, as all was fixed:
 
