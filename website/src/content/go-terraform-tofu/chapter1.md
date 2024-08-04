@@ -822,5 +822,22 @@ Example result :
 
 * <https://developer.hashicorp.com/terraform/tutorials/providers-plugin-framework/providers-plugin-framework-resource-create>
 
+TODO: complete full exaplanation descriotion of source code changes.
+
+After I added the source code `project_resource.go`, of the `pokus_project` new resource:
+* Note I had to change a lot the source code of the example given if the tutorial, which is really complicated, I think they should give a simple example, and a more complex one, for the developers to understand much better and easier. This means that for the TOFU project, there is a real big need of improving documentation and communication to developers.
+* I had to change my Pesto API:
+  * so that when creating a project, the API returns the created project,
+  * AND, such that the http answer status code is 201 (Created), instead if 204 (No content)
+* I also had to change the API golang client, such that it does not throw an error when the API returns a 201 (Created) HTTP response code, which was the case for the [_"hashicups"_ go client](https://github.com/hashicorp-demoapp/hashicups-client-go/blob/1df90c457bd4ad404c5b6ab20dfb1856c7ded558/client.go#L74)
+* All in all, some things were absolutely mandatory to fix/adjut all those aspects in all 3 compoents (the API/the go client/ and the tofu terraformation provider):
+  * adding lots of Debug level logs with tflog was extremely important, but not even enough
+  * I also had, to add debug logs in the code of my Pesto API, and to run curl tests to verify for sure, that my API indeed returned the JSON it had to return to my tofu terraformation provider.
+  * A third point was a remained unsolved question: I could not at all get any logs from the go client, when runnging `tofu apply` tests. How to do that could be solved by adding logging to a file on the filesystem I think, bu thtat is really not handy, I would like to find another method, and this point has to be worked on, to industrialize writing tofu terraformation providers.
 
 
+Finally, Here is the beautiful result I got, as all was fixed:
+
+![awesome terraformed pesto project WOOOwWWW](./images/terraforming_a_pesto_project_works_awesomeeeee.PNG)
+
+Its' so beautiful.
