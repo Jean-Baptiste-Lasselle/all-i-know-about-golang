@@ -503,3 +503,10 @@ _NEXT TODO_: <https://go.dev/tour/moretypes/2>
 <!--
 Kept for later: creating methods inside of a type starts here (with the concept of a receiver of a method): <https://go.dev/tour/methods/1>
 -->
+
+### The Ternary Operator in Golang
+
+In other languages, the ternary operator would be of the form `(boolean?"returned value if true":"returned value if false")`
+
+There is no ternary testing operation in Go: becaue the designers of the language thought that it is often making code much too complex.
+
