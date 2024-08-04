@@ -1062,3 +1062,17 @@ Et voilà!
 Awesome result (note in the below test i only changed the description of godzilla and mothra):
 
 ![awesome update result](./images/terraforming_a_pesto_project_works_awesomeeeee_update.PNG)
+
+
+A few minutes later, after I completed the work above described, which perfectly works, I then learned a big lesson, that there exist, for the problem I above describe, the _Use State For Unknown_ concept:
+
+![_Use State For Unknown_ concept](./images/terraforming_a_pesto_project_update_use_state_for_unknown.PNG)
+
+It makes so much sense of course!
+
+That's how you actually learn: you ananlyze deeply a problem, find yoru own fix which makes sense, and then you find out there is a concept in the framework, which brings a neater, more graceful way to solve the same problem!
+
+I tried that, and it beautifully works, awesome, I do not ned to explicitly access the state anymore in the Update method, neattt, see the neat result below, where I ran two more update tets on godzilla and mothra projects again:
+
+![_Use State For Unknown_ concept successful test](./images/terraforming_a_pesto_project_update_use_state_for_unknown_test.PNG)
+
