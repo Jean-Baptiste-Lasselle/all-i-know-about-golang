@@ -1076,3 +1076,102 @@ I tried that, and it beautifully works, awesome, I do not ned to explicitly acce
 
 ![_Use State For Unknown_ concept successful test](./images/terraforming_a_pesto_project_update_use_state_for_unknown_test.PNG)
 
+And here is the code I ended with, for the Update method:
+
+```Golang
+
+// Update updates the resource and sets the updated Terraform state on success.
+func (r *projectResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+ //func (r *orderResource) Update(ctx context.Context, req resource.UpdateRequest, resp *resource.UpdateResponse) {
+ // Retrieve values to update from plan (not state)
+ var plan projectResourceModel
+ diags := req.Plan.Get(ctx, &plan)
+ resp.Diagnostics.Append(diags...)
+ if resp.Diagnostics.HasError() {
+  return
+ }
+
+ // retrieve project ID from state (not plan): 
+ // Not useful anymore, instead I use 
+ // [stringplanmodifier.UseStateForUnknown()] in
+ // Schema! Neat!
+ /*
+ var state projectResourceModel
+ stateDiags := req.State.Get(ctx, &state)
+ resp.Diagnostics.Append(stateDiags...)
+    */
+
+ if resp.Diagnostics.HasError() {
+  return
+ }
+
+ // Generate API request body from plan
+
+ apiRequestBody := pesto.UpdatePestoProjectPayload{
+  ID: plan.ID.ValueString(),
+  // ID:                   state.ID.ValueString(),
+  Name:                 plan.Name.ValueString(),
+  Description:          plan.Description.ValueString(),
+  Git_ssh_uri:          plan.Git_ssh_uri.ValueString(),
+  Git_service_provider: plan.Git_service_provider.ValueString(),
+ }
+
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (plan.)ID : %v \n", plan.ID.ValueString()))
+ // tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (state.)ID : %v \n", state.ID.ValueString()))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (plan.)name : %v \n", plan.Name))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)ID : %v \n", apiRequestBody.ID))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)Name : %v \n", apiRequestBody.Name))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)Git_ssh_uri : %v \n", apiRequestBody.Git_ssh_uri))
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project of (apiRequestBody.)Description : %v \n", apiRequestBody.Description))
+
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Updating pesto project with payload : %v \n", apiRequestBody))
+ // Update existing Pesto Project
+ project, err := r.client.UpdatePestoProject(ctx, apiRequestBody, nil)
+
+ tflog.Debug(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - here is the tfsdk response object: %v", resp))
+ tflog.Debug(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - here is the project returned from Pesto API: %v", project))
+
+ var isUpdatedProjectNil string
+
+ if project != nil {
+  isUpdatedProjectNil = "NO updated pesto project object is not NIL"
+ } else {
+  isUpdatedProjectNil = "YES updated pesto project object is NIL!"
+ }
+ tflog.Debug(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Is the updated project returned from Pesto API NIL ?: %v", isUpdatedProjectNil))
+
+ // _, err := r.client.UpdatePestoProject(plan.ID.ValueString(), hashicupsItems)
+ if err != nil {
+  resp.Diagnostics.AddError(
+   "Error Updating Pesto Project",
+   "Could not update order, unexpected error: "+err.Error(),
+  )
+  return
+ }
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - UPDATE - Successfully updated pesto project of name : %v \n", project.Name))
+
+ // Update resource state with the Pesto Project returned by the API (mybe that one is not necessary ? I'm not sure, yet)
+ plan.ID = types.StringValue(plan.ID.ValueString())
+ plan = projectResourceModel{
+  ID:                   types.StringValue(project.ID),
+  Name:                 types.StringValue(project.Name),
+  Description:          types.StringValue(project.Description),
+  Git_ssh_uri:          types.StringValue(project.Git_ssh_uri),
+  Git_service_provider: types.StringValue(project.Git_service_provider),
+ }
+ // And finally update last updated timestamp
+ plan.LastUpdated = types.StringValue(time.Now().Format(time.RFC850))
+
+ // -
+ diags = resp.State.Set(ctx, plan)
+ resp.Diagnostics.Append(diags...)
+ if resp.Diagnostics.HasError() {
+  return
+ }
+}
+
+// Delete deletes the resource and removes the Terraform state on success.
+func (r *projectResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+}
+
+```
