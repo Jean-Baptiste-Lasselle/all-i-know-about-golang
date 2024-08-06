@@ -22,10 +22,11 @@ A second version will use the more recent terraform plugins framework.
 About those two version of frameworks, see <https://developer.hashicorp.com/terraform/plugin/framework-benefits>
 
 
-OKKK I know:
-* ACtually the tutorial i followed uses the new Teraform Plugin framework, so the code i wrote should be ok 
-* but the scaffolding project template i sued was made with the older SDK v2
-* now, there is a project tempalte using the new terraform plugin framework, not the old sdk v2, that is the code in this folder exactly, that i shoudl trun into a real scaffolding project template: <https://github.com/hashicorp/terraform-provider-hashicups/tree/main/12-final>
+OK I know:
+
+* Actually the tutorial I followed uses the new Teraform Plugin framework, so the code I wrote should be ok.
+* but the scaffolding project template I sued was made with the older SDK v2
+* now, there is a project tempalte using the new terraform plugin framework, not the old sdk v2, that is the code in this folder exactly, that I shoudl trun into a real scaffolding project template: <https://github.com/hashicorp/terraform-provider-hashicups/tree/main/12-final>
 
 ### Step 0: spinup the project
 
@@ -86,7 +87,7 @@ I will try with my own api available at :
 * <http://api.pesto.io:3000/api>
 * and as graphql <http://api.pesto.io:3000/graphql>
 
-if I experience any issue, i can always use the "hashicups" rest api from the tutorial.
+if I experience any issue, I can always use the "hashicups" rest api from the tutorial.
 
 ### Step 3: The most simple `provider.go` and `main.go`
 
@@ -641,7 +642,7 @@ In the previous step, to be able to test running the tofu terraformation, we add
 
 * That datasource was qualified dummy, because it didn't fetch any data from the rest API, as we run `tofu apply`.
 * We will now complete the implementation of that data source, to fix that.
-* note that i used version v0.0.3 of the [`pesto-api-client-go`](https://github.com/3forges/pesto-api-client-go).
+* note that I used version v0.0.3 of the [`pesto-api-client-go`](https://github.com/3forges/pesto-api-client-go).
 
 I only changed the source code, of the `./internal/provider/projects_data_source.go` file, to be :
 
@@ -1065,7 +1066,7 @@ func (r *projectResource) Update(ctx context.Context, req resource.UpdateRequest
 
 Et voilà!
 
-Awesome result (note in the below test i only changed the description of godzilla and mothra):
+Awesome result (note in the below test I only changed the description of godzilla and mothra):
 
 ![awesome update result](./images/terraforming_a_pesto_project_works_awesomeeeee_update.PNG)
 
@@ -1176,8 +1177,81 @@ func (r *projectResource) Update(ctx context.Context, req resource.UpdateRequest
  }
 }
 
+```
+
+### Step 10: Delete resources
+
+
+I just added the following delete method in the `internal/provider/resource_project.go`:
+
+```Golang
+
 // Delete deletes the resource and removes the Terraform state on success.
 func (r *projectResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+ // func (r *orderResource) Delete(ctx context.Context, req resource.DeleteRequest, resp *resource.DeleteResponse) {
+ // Retrieve values from state
+ var state projectResourceModel
+ diags := req.State.Get(ctx, &state)
+ resp.Diagnostics.Append(diags...)
+ if resp.Diagnostics.HasError() {
+  return
+ }
+
+ // Delete existing order
+ project, err := r.client.DeletePestoProject(ctx, state.ID.ValueString(), nil)
+ if err != nil {
+  resp.Diagnostics.AddError(
+   "Error Deleting Pesto Project",
+   fmt.Sprintf("Could not delete Pesto Project of ID=[%v], name=[%v] unexpected error: %v", state.ID, state.Name, err.Error()),
+  )
+  return
+ }
+ tflog.Info(ctx, fmt.Sprintf("PROJECT RESOURCE - DELETE - Successfully deleted pesto project of name : %v \n", project.Name))
+
+}
+```
+
+And in the `pesto-api-client-go` client, in the `pestoprojects.go` source File, I added the following delete method:
+
+```Golang
+
+// DeletePestoProject - Deletes a Pesto Project
+func (c *Client) DeletePestoProject(ctx context.Context, PestoProjectID string, authToken *string) (*PestoProject, error) {
+ req, err := http.NewRequest("DELETE", fmt.Sprintf("%s/pesto-project/%s", c.HostURL, PestoProjectID), nil)
+ if err != nil {
+  return nil, err
+ }
+
+ body, err := c.doRequest(req, authToken)
+ if err != nil {
+  return nil, err
+ }
+
+ tflog.Debug(ctx, fmt.Sprintf("PESTO API CLIENT GO - DELETE PESTO PROJECT - here is the API Response Body returned from Pesto API: %v ", body))
+ fmt.Printf("PESTO API CLIENT GO - DELETE PESTO PROJECT - here is the API Response Body returned from Pesto API: %v \n", body)
+ var isAPIResponseBodyNil string
+
+ if body != nil {
+  isAPIResponseBodyNil = "NO API Response Body object is not NIL"
+ } else {
+  isAPIResponseBodyNil = "YES API Response Body object is NIL!"
+ }
+ tflog.Debug(ctx, fmt.Sprintf("PESTO API CLIENT GO - DELETE PESTO PROJECT - Is the API Response Body returned from Pesto API NIL ?: %v", isAPIResponseBodyNil))
+ fmt.Printf("PESTO API CLIENT GO - DELETE PESTO PROJECT - Is the API Response Body returned from Pesto API NIL ?: %v \n", isAPIResponseBodyNil)
+
+ // if string(body) != "Deleted order" {
+ //  return errors.New(string(body))
+ // }
+
+ deletedPestoProject := PestoProject{}
+
+ err = json.Unmarshal(body, &deletedPestoProject)
+ if err != nil {
+  return nil, err
+ }
+ return &deletedPestoProject, nil
 }
 
 ```
+
+You can find the above delete method, into the release v0.0.11 of the <https://github.com/3forges/pesto-api-client-go> repository.
